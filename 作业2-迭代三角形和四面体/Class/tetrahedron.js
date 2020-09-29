@@ -6,14 +6,21 @@ var tmpPoints = [];
 var B = 0.5;
 var C = 2;
 var D = 0.3;*/
-var A = -1.5;
-var B = 1.5;
-var C = 3.5;
+var A = -0.6;
+var B = 0.5;
+var C = 3;
 var D = 0;
 var E = A*A + B*B + C*C;
+var canvas;
+var initPoint = [
+    vec3(0, 0.0, -1.0),
+    vec3(0.0, 0.9428, 0.3333),
+    vec3(-0.8165, -0.4714, 0.3333),
+    vec3(0.8165, -0.4714, 0.3333)
+]
 window.onload = function init()
 {
-    var canvas = document.getElementById( "gl-canvas" );
+    canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
@@ -25,16 +32,17 @@ window.onload = function init()
         vec3(),
     ]
     */
+    /*
     var initPoint = [
         vec3(0, 0.0, -1.0),
         vec3(0.0, 0.9428, 0.3333),
         vec3(-0.8165, -0.4714, 0.3333),
         vec3(0.8165, -0.4714, 0.3333)
-    ]
+    ]*/
     //console.log(initPoint[1][1]);
     gasket3d(initPoint[0],initPoint[1],initPoint[2],initPoint[3], 5);
     //  Configure WebGL
-
+    /*
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     gl.enable(gl.DEPTH_TEST);
@@ -53,13 +61,32 @@ window.onload = function init()
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-    console.log(points.length);
-    show();
+    */
+    //console.log(points.length);
+    //show();
     render();
 };
 
 
 function render() {
+    gl.viewport( 0, 0, canvas.width, canvas.height );
+    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.enable(gl.DEPTH_TEST);
+    //  Load shaders and initialize attribute buffers
+    
+    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    gl.useProgram( program );
+    
+    // Load the data into the GPU
+    var bufferId = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
+    gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(points), gl.STATIC_DRAW );
+
+    // Associate out shader variables with our data buffer
+    
+    var vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.drawArrays( gl.TRIANGLES, 0, points.length );
 }
@@ -97,19 +124,11 @@ function drawTetrahedron(a, b, c, d){
 }
 
 function send(a, b, c,){
-    //points.push(a, b, c);
-    //points.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
     var aa = turnToPlain(a);
     var bb = turnToPlain(b);
     var cc = turnToPlain(c);
 
     points.push(aa[0], aa[1], bb[0], bb[1], cc[0], cc[1] )
-}
-
-function show(){
-    for(var i = 0; i < points.length; i+=3){
-        console.log(points[i], points[i+1], points[i+2]);
-    }
 }
 
 function turnToPlain(p){
@@ -120,4 +139,21 @@ function turnToPlain(p){
     var yy = ((A*A + C*C)*y - B*(A*x + C*z + D)) / (E);
     var zz = ((B*B + A*A)*z - C*(A*x + B*y + D)) / (E);
     return [xx, yy, zz];
+}
+
+function roast(){
+    A = document.getElementById("rangeA").value;
+    B = document.getElementById("rangeB").value;
+    C = document.getElementById("rangeC").value;
+    console.log(A, B, C);
+    points = [];
+    gasket3d(initPoint[0],initPoint[1],initPoint[2],initPoint[3], 5);
+    render();
+}
+
+
+function show(){
+    for(var i = 0; i < points.length; i+=3){
+        console.log(points[i], points[i+1], points[i+2]);
+    }
 }

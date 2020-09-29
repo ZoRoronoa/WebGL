@@ -41,6 +41,7 @@ function render() {
     gl.drawArrays( gl.TRIANGLES, 0, points.length );
 }
 
+//求中点
 function mid(a, b){
     var x = (a[0] + b[0]) / 2;
     var y = (a[1] + b[1]) / 2;
@@ -48,23 +49,22 @@ function mid(a, b){
     return [x, y, z];
 }
 
-
 //注意：需要考虑大小三角形的绘制顺序
 function gasket2d(a, b, c, count){
+    //递归出口
     if (count == 0) {
-        drawTriangle(a, b, c, 5);
+        drawTriangle(a, b, c);
     }
     else{
         console.log(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
-        count --; //console.log("insert one");
+        count --; 
+        //一个三角形递归生成三个三角形
         gasket2d(a, mid(a, b), mid(a, c), count);
         gasket2d(mid(a, b), b, mid(b, c), count);
         gasket2d(mid(a, c), mid(b, c), c, count);    
     }
 }
-
+//将各点坐标存入数组
 function drawTriangle(a, b, c){
     points.push(a[0], a[1], b[0], b[1], c[0], c[1]);
-    //gl.clear( gl.COLOR_BUFFER_BIT );
-    //gl.drawArrays( gl.TRIANGLES, 0, points.length );
 }
